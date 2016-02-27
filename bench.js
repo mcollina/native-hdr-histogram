@@ -7,7 +7,7 @@ const histogram = new Histogram(1, 100)
 
 console.time(key)
 for (let i = 0; i < max; i++) {
-  histogram.record(Math.floor((Math.random() * 100 + 1)))
+  histogram.record(Math.floor((Math.random() * 42 + 1)))
 }
 console.timeEnd(key)
 
