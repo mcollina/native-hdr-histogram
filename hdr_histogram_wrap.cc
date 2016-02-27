@@ -17,6 +17,7 @@ NAN_MODULE_INIT(HdrHistogramWrap::Init) {
   Nan::SetPrototypeMethod(tpl, "max", Max);
   Nan::SetPrototypeMethod(tpl, "mean", Mean);
   Nan::SetPrototypeMethod(tpl, "stddev", Stddev);
+  Nan::SetPrototypeMethod(tpl, "percentile", Percentile);
 
   constructor.Reset(Nan::GetFunction(tpl).ToLocalChecked());
   Nan::Set(target, Nan::New("HdrHistogram").ToLocalChecked(), Nan::GetFunction(tpl).ToLocalChecked());
@@ -94,5 +95,19 @@ NAN_METHOD(HdrHistogramWrap::Mean) {
 NAN_METHOD(HdrHistogramWrap::Stddev) {
   HdrHistogramWrap* obj = Nan::ObjectWrap::Unwrap<HdrHistogramWrap>(info.This());
   double value = hdr_stddev(obj->histogram);
+  info.GetReturnValue().Set(value);
+}
+
+NAN_METHOD(HdrHistogramWrap::Percentile) {
+  double percentile;
+
+  if (info[0]->IsUndefined()) {
+    // TODO maybe throw?
+    return;
+  }
+
+  percentile = Nan::To<double>(info[0]).FromJust();
+  HdrHistogramWrap* obj = Nan::ObjectWrap::Unwrap<HdrHistogramWrap>(info.This());
+  double value = hdr_value_at_percentile(obj->histogram, percentile);
   info.GetReturnValue().Set(value);
 }
