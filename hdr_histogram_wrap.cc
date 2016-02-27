@@ -15,6 +15,8 @@ NAN_MODULE_INIT(HdrHistogramWrap::Init) {
   Nan::SetPrototypeMethod(tpl, "record", Record);
   Nan::SetPrototypeMethod(tpl, "min", Min);
   Nan::SetPrototypeMethod(tpl, "max", Max);
+  Nan::SetPrototypeMethod(tpl, "mean", Mean);
+  Nan::SetPrototypeMethod(tpl, "stddev", Stddev);
 
   constructor.Reset(Nan::GetFunction(tpl).ToLocalChecked());
   Nan::Set(target, Nan::New("HdrHistogram").ToLocalChecked(), Nan::GetFunction(tpl).ToLocalChecked());
@@ -80,4 +82,16 @@ NAN_METHOD(HdrHistogramWrap::Max) {
   HdrHistogramWrap* obj = Nan::ObjectWrap::Unwrap<HdrHistogramWrap>(info.This());
   int64_t value = hdr_max(obj->histogram);
   info.GetReturnValue().Set((int32_t) value);
+}
+
+NAN_METHOD(HdrHistogramWrap::Mean) {
+  HdrHistogramWrap* obj = Nan::ObjectWrap::Unwrap<HdrHistogramWrap>(info.This());
+  double value = hdr_mean(obj->histogram);
+  info.GetReturnValue().Set(value);
+}
+
+NAN_METHOD(HdrHistogramWrap::Stddev) {
+  HdrHistogramWrap* obj = Nan::ObjectWrap::Unwrap<HdrHistogramWrap>(info.This());
+  double value = hdr_stddev(obj->histogram);
+  info.GetReturnValue().Set(value);
 }
