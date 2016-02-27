@@ -35,6 +35,7 @@ HdrHistogramWrap::HdrHistogramWrap(
 }
 
 HdrHistogramWrap::~HdrHistogramWrap() {
+  delete this->histogram;
 }
 
 NAN_METHOD(HdrHistogramWrap::New) {
