@@ -20,8 +20,8 @@ NAN_MODULE_INIT(HdrHistogramWrap::Init) {
   Nan::SetPrototypeMethod(tpl, "stddev", Stddev);
   Nan::SetPrototypeMethod(tpl, "percentile", Percentile);
   Nan::SetPrototypeMethod(tpl, "encode", Encode);
-
   Nan::SetMethod(tpl, "decode", Decode);
+  Nan::SetPrototypeMethod(tpl, "percentiles", Percentiles);
 
   constructor.Reset(Nan::GetFunction(tpl).ToLocalChecked());
   Nan::Set(target, Nan::New("HdrHistogram").ToLocalChecked(), Nan::GetFunction(tpl).ToLocalChecked());
@@ -119,8 +119,8 @@ NAN_METHOD(HdrHistogramWrap::Percentile) {
 
   double percentile = Nan::To<double>(info[0]).FromJust();
 
-  if (percentile <= 0.0 || percentile >= 100.0) {
-    return Nan::ThrowError("percentile must be > 0 and < 100");
+  if (percentile <= 0.0 || percentile > 100.0) {
+    return Nan::ThrowError("percentile must be > 0 and <= 100");
   }
 
   HdrHistogramWrap* obj = Nan::ObjectWrap::Unwrap<HdrHistogramWrap>(info.This());
@@ -158,4 +158,32 @@ NAN_METHOD(HdrHistogramWrap::Decode) {
   hdr_log_decode(&obj->histogram, encoded, len);
 
   info.GetReturnValue().Set(wrap);
+}
+
+NAN_METHOD(HdrHistogramWrap::Percentiles) {
+  HdrHistogramWrap* obj = Nan::ObjectWrap::Unwrap<HdrHistogramWrap>(info.This());
+  v8::Local<v8::Array> result = Nan::New<v8::Array>();
+
+  hdr_iter iter;
+  hdr_iter_percentile_init(&iter, obj->histogram, 1);
+
+  int count = 0;
+
+  while(hdr_iter_next(&iter)) {
+    v8::Local<v8::Object> percentile = Nan::New<v8::Object>();
+
+    Nan::Set(
+        percentile,
+        Nan::New("percentile").ToLocalChecked(),
+        Nan::New(iter.specifics.percentiles.percentile));
+
+    Nan::Set(
+        percentile,
+        Nan::New("value").ToLocalChecked(),
+        Nan::New((double) iter.value));
+
+    Nan::Set(result, count++, percentile);
+  }
+
+  info.GetReturnValue().Set(result);
 }

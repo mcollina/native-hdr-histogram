@@ -13,3 +13,5 @@ console.timeEnd(key)
 
 console.log('80 percentile is', histogram.percentile(80))
 console.log('99 percentile is', histogram.percentile(99))
+
+console.log(histogram.percentiles())
