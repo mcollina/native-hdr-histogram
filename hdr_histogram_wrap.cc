@@ -23,20 +23,10 @@ NAN_MODULE_INIT(HdrHistogramWrap::Init) {
   Nan::Set(target, Nan::New("HdrHistogram").ToLocalChecked(), Nan::GetFunction(tpl).ToLocalChecked());
 }
 
-HdrHistogramWrap::HdrHistogramWrap(
-    int64_t lowest_trackable_value,
-    int64_t highest_trackable_value,
-    int significant_figures) {
-
-  hdr_init(
-      lowest_trackable_value,
-      highest_trackable_value,
-      significant_figures,
-      &this->histogram);
-}
-
 HdrHistogramWrap::~HdrHistogramWrap() {
-  delete this->histogram;
+  if (this->histogram) {
+    delete this->histogram;
+  }
 }
 
 NAN_METHOD(HdrHistogramWrap::New) {
@@ -45,7 +35,27 @@ NAN_METHOD(HdrHistogramWrap::New) {
     int64_t highest = info[1]->IsUndefined() ? 100 : Nan::To<int64_t>(info[1]).FromJust();
     int significant_figures = info[2]->IsUndefined() ? 3 : Nan::To<int>(info[2]).FromJust();
 
-    HdrHistogramWrap *obj = new HdrHistogramWrap(lowest, highest, significant_figures);
+    if (lowest <= 0) {
+      return Nan::ThrowError("The lowest trackable number must be greater than 0");
+    }
+
+    if (significant_figures < 1 || significant_figures > 5) {
+      return Nan::ThrowError("The significant figures must be between 1 and 5 (inclusive)");
+    }
+
+    HdrHistogramWrap *obj = new HdrHistogramWrap();
+
+    int init_result = hdr_init(
+        lowest,
+        highest,
+        significant_figures,
+        &obj->histogram);
+
+    if (init_result != 0) {
+      delete obj;
+      return Nan::ThrowError("Unable to initialize the Histogram");
+    }
+
     obj->Wrap(info.This());
     info.GetReturnValue().Set(info.This());
   } else {
@@ -99,14 +109,16 @@ NAN_METHOD(HdrHistogramWrap::Stddev) {
 }
 
 NAN_METHOD(HdrHistogramWrap::Percentile) {
-  double percentile;
-
   if (info[0]->IsUndefined()) {
-    // TODO maybe throw?
-    return;
+    return Nan::ThrowError("No percentile specified");
   }
 
-  percentile = Nan::To<double>(info[0]).FromJust();
+  double percentile = Nan::To<double>(info[0]).FromJust();
+
+  if (percentile <= 0.0 || percentile >= 100.0) {
+    return Nan::ThrowError("percentile must be > 0 and < 100");
+  }
+
   HdrHistogramWrap* obj = Nan::ObjectWrap::Unwrap<HdrHistogramWrap>(info.This());
   double value = hdr_value_at_percentile(obj->histogram, percentile);
   info.GetReturnValue().Set(value);

@@ -13,6 +13,18 @@ test('create an histogram with a constructor', (t) => {
   t.end()
 })
 
+test('create an histogram arguments checks', (t) => {
+  t.throws(() => Histogram(-1, 100))
+  t.throws(() => Histogram(0, 100))
+  t.throws(() => Histogram(1, 100, 20))
+  t.throws(() => Histogram(1, 100, 0))
+  t.throws(() => Histogram(1, 100, 6))
+  for (let i = 1; i < 5; i++) {
+    t.doesNotThrow(() => Histogram(1, 100, i))
+  }
+  t.end()
+})
+
 test('record values in an histogram', (t) => {
   const instance = new Histogram(1, 100)
   t.ok(instance.record(42))
@@ -45,5 +57,18 @@ test('percentile', (t) => {
   t.ok(instance.record(45))
   t.equal(instance.percentile(10), 42, 'percentile match')
   t.equal(instance.percentile(99), 45, 'percentile match')
+  t.end()
+})
+
+test('wrong percentile', (t) => {
+  const instance = Histogram(1, 100)
+  t.ok(instance.record(42))
+  t.ok(instance.record(42))
+  t.ok(instance.record(45))
+  t.throws(() => instance.percentile(), 'no percentile throws')
+  t.throws(() => instance.percentile(101), 'percentile > 100 throws')
+  t.throws(() => instance.percentile(100), 'percentile == 100 throws')
+  t.throws(() => instance.percentile(0), 'percentile == 0 throws')
+  t.throws(() => instance.percentile(-1), 'percentile < 0 throws')
   t.end()
 })

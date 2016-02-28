@@ -12,10 +12,6 @@ class HdrHistogramWrap : public Nan::ObjectWrap {
   static void Init(v8::Local<v8::Object> exports);
 
  private:
-  HdrHistogramWrap(
-    int64_t lowest_trackable_value,
-    int64_t highest_trackable_value,
-    int significant_figures);
   ~HdrHistogramWrap();
 
   static void New(const Nan::FunctionCallbackInfo<v8::Value>& info);

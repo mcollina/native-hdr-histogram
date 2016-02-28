@@ -5,7 +5,7 @@
   "main": "histogram.js",
   "gypfile": "true",
   "scripts": {
-    "test": "node-gyp rebuild && standard && tap test.js"
+    "test": "node-gyp build && standard && tap test.js"
   },
   "precommit": ["test"],
   "repository": {
