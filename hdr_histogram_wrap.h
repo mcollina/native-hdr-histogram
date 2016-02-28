@@ -21,6 +21,9 @@ class HdrHistogramWrap : public Nan::ObjectWrap {
   static void Mean(const Nan::FunctionCallbackInfo<v8::Value>& info);
   static void Stddev(const Nan::FunctionCallbackInfo<v8::Value>& info);
   static void Percentile(const Nan::FunctionCallbackInfo<v8::Value>& info);
+  static void Encode(const Nan::FunctionCallbackInfo<v8::Value>& info);
+  static void Decode(const Nan::FunctionCallbackInfo<v8::Value>& info);
+
   static Nan::Persistent<v8::Function> constructor;
 
   struct hdr_histogram *histogram;

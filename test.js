@@ -72,3 +72,22 @@ test('wrong percentile', (t) => {
   t.throws(() => instance.percentile(-1), 'percentile < 0 throws')
   t.end()
 })
+
+test('encode/decode', (t) => {
+  const instance = Histogram(1, 100)
+  t.ok(instance.record(42))
+  t.ok(instance.record(42))
+  t.ok(instance.record(45))
+  const instance2 = Histogram.decode(instance.encode())
+  t.equal(instance2.percentile(10), 42, 'percentile match')
+  t.equal(instance2.percentile(99), 45, 'percentile match')
+  t.end()
+})
+
+test('fail decode', (t) => {
+  t.throws(() => Histogram.decode())
+  t.throws(() => Histogram.decode('hello'))
+  t.throws(() => Histogram.decode({}))
+  t.throws(() => Histogram.decode(42))
+  t.end()
+})

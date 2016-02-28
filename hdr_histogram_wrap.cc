@@ -3,6 +3,7 @@
 
 extern "C" {
 #include "hdr_histogram.h"
+#include "hdr_histogram_log.h"
 }
 
 Nan::Persistent<v8::Function> HdrHistogramWrap::constructor;
@@ -18,6 +19,9 @@ NAN_MODULE_INIT(HdrHistogramWrap::Init) {
   Nan::SetPrototypeMethod(tpl, "mean", Mean);
   Nan::SetPrototypeMethod(tpl, "stddev", Stddev);
   Nan::SetPrototypeMethod(tpl, "percentile", Percentile);
+  Nan::SetPrototypeMethod(tpl, "encode", Encode);
+
+  Nan::SetMethod(tpl, "decode", Decode);
 
   constructor.Reset(Nan::GetFunction(tpl).ToLocalChecked());
   Nan::Set(target, Nan::New("HdrHistogram").ToLocalChecked(), Nan::GetFunction(tpl).ToLocalChecked());
@@ -122,4 +126,36 @@ NAN_METHOD(HdrHistogramWrap::Percentile) {
   HdrHistogramWrap* obj = Nan::ObjectWrap::Unwrap<HdrHistogramWrap>(info.This());
   double value = hdr_value_at_percentile(obj->histogram, percentile);
   info.GetReturnValue().Set(value);
+}
+
+NAN_METHOD(HdrHistogramWrap::Encode) {
+  HdrHistogramWrap* obj = Nan::ObjectWrap::Unwrap<HdrHistogramWrap>(info.This());
+  char *encoded;
+  int result = hdr_log_encode(obj->histogram, &encoded);
+  if (result != 0) {
+    return Nan::ThrowError("failed to encode");
+  }
+  int len = strlen(encoded);
+  Nan::MaybeLocal<v8::Object> buf = Nan::NewBuffer(encoded, len);
+  info.GetReturnValue().Set(buf.ToLocalChecked());
+}
+
+NAN_METHOD(HdrHistogramWrap::Decode) {
+  v8::Local<v8::Value> buf;
+  if (info.Length() > 0 && info[0]->IsObject(), node::Buffer::HasInstance(info[0])) {
+    buf = info[0];
+  } else {
+    return Nan::ThrowError("Missing Buffer");
+  }
+  char *encoded = node::Buffer::Data(buf);
+  size_t len  = node::Buffer::Length(buf);
+  const int argc = 0;
+  v8::Local<v8::Value> argv[argc] = {};
+  v8::Local<v8::Function> cons = Nan::New(constructor);
+  v8::Local<v8::Object> wrap = cons->NewInstance(argc, argv);
+  HdrHistogramWrap* obj = Nan::ObjectWrap::Unwrap<HdrHistogramWrap>(wrap);
+
+  hdr_log_decode(&obj->histogram, encoded, len);
+
+  info.GetReturnValue().Set(wrap);
 }
