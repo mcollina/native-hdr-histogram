@@ -19,6 +19,11 @@
       "include_dirs": [
         "<!(node -e \"require('nan')\")",
         "src/"
+      ],
+      "conditions": [
+        ["OS == \"linux\"", {
+          "ccflags": [ "-std=c99" ]
+        }]
       ]
     }
   ]
