@@ -4,7 +4,8 @@
       "target_name": "histogram",
       "conditions": [
         ["OS == \"linux\"", {
-          "cflags": [ "-std=c99" ]
+          "cflags": [ "-D_GNU_SOURCE" ],
+          "libraries": [ "-lz" ]
         }]
       ],
       "sources": [
