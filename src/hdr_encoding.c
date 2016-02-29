@@ -301,7 +301,9 @@ int base64_decode(
         return EINVAL;
     }
 
-    for (int i = 0, j = 0; i < input_len; i += 4, j += 3)
+    int i, j;
+
+    for (i = 0, j = 0; i < input_len; i += 4, j += 3)
     {
         base64_decode_block(&input[i], &output[j]);
     }

@@ -24,6 +24,14 @@ at [node-gyp][node-gyp].
 
 ## Install
 
+On Linux, you will need `zlib1g-dev`, install it with:
+
+```
+sudo apt-get install zlib1g-dev
+```
+
+On Mac, then you can install the native module:
+
 ```
 npm i native-hdr-histogram --save
 ```
