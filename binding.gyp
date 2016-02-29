@@ -2,6 +2,11 @@
   "targets": [
     {
       "target_name": "histogram",
+      "conditions": [
+        ["OS == \"linux\"", {
+          "cflags": [ "-std=c99" ]
+        }]
+      ],
       "sources": [
         "src/hdr_encoding.h",
         "src/hdr_encoding.c",
@@ -19,11 +24,6 @@
       "include_dirs": [
         "<!(node -e \"require('nan')\")",
         "src/"
-      ],
-      "conditions": [
-        ["OS == \"linux\"", {
-          "ccflags": [ "-std=c99" ]
-        }]
       ]
     }
   ]
