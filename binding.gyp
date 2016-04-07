@@ -9,8 +9,6 @@
         "src/hdr_histogram.c",
         "src/hdr_histogram_log.h",
         "src/hdr_histogram_log.c",
-        "src/hdr_interval_recorder.h",
-        "src/hdr_interval_recorder.c",
         "hdr_histogram_wrap.cc",
         "histogram.cc"
       ],
