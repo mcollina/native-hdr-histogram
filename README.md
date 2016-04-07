@@ -6,35 +6,25 @@ node.js bindings for [hdr histogram][hdr] [C implementation][cimpl].
 in latency and performance sensitive applications. Measurements show
 value recording times as low as 3-6 nanoseconds on modern (circa 2014)
 Intel CPUs. A Histogram's memory footprint is constant, with no
-allocation operations involved in recording data values or in iterating through them. - from [hdr histogram][hdr] website
+allocation operations involved in recording data values or in iterating through them. 
+- from [hdr histogram][hdr] website
 
 This library is blazingly fast, and you can use it to record
 histograms with no overhead.
 
-  * <a href="#prerequisites">Prerequisites</a>
   * <a href="#install">Installation</a>
   * <a href="#example">Example</a>
   * <a href="#api">API</a>
   * <a href="#licence">Licence &amp; copyright</a>
 
-## Prerequisites
-
-You need to be able to compile native addons: follow the instructions
-at [node-gyp][node-gyp].
-
 ## Install
-
-On Linux, you will need `zlib1g-dev`, install it with:
-
-```
-sudo apt-get install zlib1g-dev
-```
-
-On Mac, then you can install the native module:
 
 ```
 npm i native-hdr-histogram --save
 ```
+
+If you see any errors, you might need to configure your system to compile native addons:
+follow the instructions at [node-gyp][node-gyp].
 
 ## Example
 
