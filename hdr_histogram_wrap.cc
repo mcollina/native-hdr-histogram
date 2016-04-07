@@ -150,9 +150,8 @@ NAN_METHOD(HdrHistogramWrap::Decode) {
   char *encoded = node::Buffer::Data(buf);
   size_t len  = node::Buffer::Length(buf);
   const int argc = 0;
-  v8::Local<v8::Value> argv[argc] = {};
   v8::Local<v8::Function> cons = Nan::New(constructor);
-  v8::Local<v8::Object> wrap = cons->NewInstance(argc, argv);
+  v8::Local<v8::Object> wrap = cons->NewInstance(argc, NULL);
   HdrHistogramWrap* obj = Nan::ObjectWrap::Unwrap<HdrHistogramWrap>(wrap);
 
   hdr_log_decode(&obj->histogram, encoded, len);

@@ -2,11 +2,6 @@
   "targets": [
     {
       "target_name": "histogram",
-      "conditions": [
-        ["OS == \"linux\"", {
-          "libraries": [ "-lz" ]
-        }]
-      ],
       "sources": [
         "src/hdr_encoding.h",
         "src/hdr_encoding.c",
@@ -14,12 +9,11 @@
         "src/hdr_histogram.c",
         "src/hdr_histogram_log.h",
         "src/hdr_histogram_log.c",
-        "src/hdr_interval_recorder.h",
-        "src/hdr_interval_recorder.c",
-        "src/hdr_writer_reader_phaser.h",
-        "src/hdr_writer_reader_phaser.c",
         "hdr_histogram_wrap.cc",
         "histogram.cc"
+      ],
+      "dependencies": [
+        "<(module_root_dir)/zlib/zlib.gyp:zlib"
       ],
       "include_dirs": [
         "<!(node -e \"require('nan')\")",

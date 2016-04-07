@@ -18,13 +18,19 @@
 #define HDR_INFLATE_FAIL -29994
 #define HDR_LOG_INVALID_VERSION -29993
 #define HDR_TRAILING_ZEROS_INVALID -29992
+#define HDR_VALUE_TRUNCATED -29991
+#define HDR_ENCODED_INPUT_TOO_LONG -29990
 
 #include <stdint.h>
 #include <stdbool.h>
 #include <stdio.h>
-#include <time.h>
 
+#include "hdr_time.h"
 #include "hdr_histogram.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /**
  * Encode and compress the histogram with gzip.
@@ -38,6 +44,7 @@ int hdr_log_decode(struct hdr_histogram** histogram, char* base64_histogram, siz
 
 struct hdr_log_writer
 {
+	uint32_t nonce;
 };
 
 /**
@@ -63,7 +70,7 @@ int hdr_log_write_header(
     struct hdr_log_writer* writer,
     FILE* file,
     const char* user_prefix,
-    struct timespec* timestamp);
+    hdr_timespec* timestamp);
 
 /**
  * Write an hdr_histogram entry to the log.  It will be encoded in a similar
@@ -89,15 +96,15 @@ int hdr_log_write_header(
 int hdr_log_write(
     struct hdr_log_writer* writer,
     FILE* file,
-    const struct timespec* start_timestamp,
-    const struct timespec* end_timestamp,
+    const hdr_timespec* start_timestamp,
+    const hdr_timespec* end_timestamp,
     struct hdr_histogram* histogram);
 
 struct hdr_log_reader
 {
     int major_version;
     int minor_version;
-    struct timespec start_timestamp;
+    hdr_timespec start_timestamp;
 };
 
 /**
@@ -142,7 +149,7 @@ int hdr_log_read_header(struct hdr_log_reader* reader, FILE* file);
  */
 int hdr_log_read(
     struct hdr_log_reader* reader, FILE* file, struct hdr_histogram** histogram,
-    struct timespec* timestamp, struct timespec* interval);
+    hdr_timespec* timestamp, hdr_timespec* interval);
 
 /**
  * Returns a string representation of the error number.
@@ -151,5 +158,9 @@ int hdr_log_read(
  * @return The user readable representation of the error.
  */
 const char* hdr_strerror(int errnum);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
