@@ -10,7 +10,8 @@ allocation operations involved in recording data values or in iterating through 
 - from [hdr histogram][hdr] website
 
 This library is blazingly fast, and you can use it to record
-histograms with no overhead.
+histograms with no overhead. Linux, Mac OS X and Windows are all
+supported.
 
   * <a href="#install">Installation</a>
   * <a href="#example">Example</a>
