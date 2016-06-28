@@ -1,6 +1,6 @@
 # native-hdr-histogram
 
-node.js bindings for [hdr histogram][hdr] [C implementation][cimpl].
+node.js bindings for [hdr histogram][hdr] [C implementation][cimpl](version 0.9.3).
 
 > HDR Histogram is designed for recoding histograms of value measurements
 in latency and performance sensitive applications. Measurements show
