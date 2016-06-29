@@ -38,3 +38,4 @@ zlib/Release/
 zlib/zlib.sln
 zlib/zlib.vcxproj
 zlib/zlib.vcxproj.filters
+lib/binding

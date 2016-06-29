@@ -7,7 +7,7 @@
   "scripts": {
     "preinstall":"npm install node-pre-gyp",
     "install" : "node-pre-gyp install --fallback-to-build",
-    "test": "node-gyp build && standard && tap test.js",
+    "test": "node-pre-gyp install --fallback-to-build && standard && tap test.js",
     "prepublish": "npm ls"
   },
   "precommit": ["test"],
