@@ -5,7 +5,10 @@
   "main": "histogram.js",
   "gypfile": "true",
   "scripts": {
-    "test": "node-gyp build && standard && tap test.js"
+    "preinstall":"npm install node-pre-gyp",
+    "install" : "node-pre-gyp install --fallback-to-build",
+    "test": "node-gyp build && standard && tap test.js",
+    "prepublish": "npm ls"
   },
   "precommit": ["test"],
   "repository": {
@@ -28,8 +31,15 @@
     "standard": "^6.0.7",
     "tap": "^5.7.0"
   },
+  "binary": {
+      "module_name" : "histogram",
+      "module_path" : "./lib/binding/{node_abi}-{platform}-{arch}",
+      "remote_path" : "./{name}/v{version}/{toolset}/",
+      "package_name": "{node_abi}-{platform}-{arch}.tar.gz",
+      "host"        : "https://autocannon-assets.s3-eu-west-1.amazonaws.com"
+  },
   "dependencies": {
-    "bindings": "^1.2.1",
-    "nan": "^2.3.0"
+    "nan": "^2.3.0",
+    "node-pre-gyp": "0.6.x"
   }
 }

@@ -1,0 +1,33 @@
+environment:
+  node_pre_gyp_accessKeyId:
+    secure: 2JnyP2jeVn1v7ZpLgaBuHLJmV2+5FtW1SFJt5l+vSFo=
+  node_pre_gyp_secretAccessKey:
+    secure: tqSSbKPtt2RiN8jPJIoRsAakCvQ1NOjakqKnIPYosupsyuQKrfTi304DeHzxqEBX
+  matrix:
+    - nodejs_version: 4.0.0
+      platform: x64
+      msvs_toolset: 12
+    - nodejs_version: 4.0.0
+      platform: x86
+      msvs_toolset: 12
+    - nodejs_version: 5.0.0
+      platform: x64
+      msvs_toolset: 12
+    - nodejs_version: 5.0.0
+      platform: x86
+      msvs_toolset: 12
+    - nodejs_version: 6.0.0
+      platform: x64
+      msvs_toolset: 12
+    - nodejs_version: 6.0.0
+      platform: x86
+      msvs_toolset: 12
+
+os: Visual Studio 2015
+
+install:
+  - scripts\build-appveyor.bat
+
+build: OFF
+test: OFF
+deploy: OFF
