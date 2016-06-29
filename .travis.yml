@@ -52,9 +52,6 @@ matrix:
         - clang-3.5
   - os: osx
     compiler: clang
-    env: NODE_VERSION="5" COVERAGE=true PUBLISHABLE=false
-  - os: osx
-    compiler: clang
     env: NODE_VERSION="6"
   - os: osx
     compiler: clang
