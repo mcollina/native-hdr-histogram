@@ -1,14 +1,14 @@
 {
   "name": "native-hdr-histogram",
-  "version": "0.2.1",
+  "version": "0.3.0-pre1",
   "description": "node.js bindings for hdr histogram C implementation",
   "main": "histogram.js",
   "gypfile": "true",
   "scripts": {
+    "prepublish":"npm ls",
     "preinstall":"npm install node-pre-gyp",
-    "install" : "node-pre-gyp install --fallback-to-build",
-    "test": "node-pre-gyp install --fallback-to-build && standard && tap test.js",
-    "prepublish": "npm ls"
+    "install": "node-pre-gyp install --fallback-to-build",
+    "test": "node-pre-gyp install --fallback-to-build && standard && tap test.js"
   },
   "precommit": ["test"],
   "repository": {
@@ -27,6 +27,7 @@
   },
   "homepage": "https://github.com/mcollina/native-hdr-histogram#readme",
   "devDependencies": {
+    "aws-sdk": "2.x",
     "pre-commit": "^1.1.2",
     "standard": "^6.0.7",
     "tap": "^5.7.0"

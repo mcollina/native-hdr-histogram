@@ -16,7 +16,6 @@ function publish() {
 npm install --build-from-source  --clang=1
 npm test
 
-
 publish
 
 platform=$(uname -s | sed "y/ABCDEFGHIJKLMNOPQRSTUVWXYZ/abcdefghijklmnopqrstuvwxyz/")

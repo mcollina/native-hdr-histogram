@@ -66,8 +66,12 @@ env:
   - secure: wugo4xhy7hO5SErSxysmEWvcOmuiCrexcS65qMUgFCkiN0ZyPiMhjY0n4EQinj5PCFbToM/4AQO8WjEgbDAljEvMuf63vx1git9bck69zpCAqh+XmaD8MJNBbtmVbUaADL3JLTY+/ObfRv8LQOIVmHXKk1GD8VSnJgOT3RKl/ZRWXrGUFByta37j3M8RTHyEMxhTR7NHD9Hl8CjNLfz22JQgcIWrhJl8OHZbwL8XZ9sL77Zwe1AQkaAh4BKReOetza1cyLq2HNANI+a3PrzCzP8Lc63r8kOEoMrP2fENHua689z64FrGwup6Ltfl2DGnCWZkknrm8djUQEjXBWxToqtYWVbZF0Lu14LxPG0mXT6X9lu284THdWJEkQ7xzPoF+yCFdVfvSKE+ktJKqK4wJk91RtpLqOkIzCxyvQRDLxT128FVOfWu/uiWZjbxLQHlUvZm4ZQH1FMH2c3PE4oYS+LOUhJNfmz9fEFEKKivh7BG5ZFbtIQSSd/iRyOXbbetkT6rZJdXVRyWqsuHfux6wbyCeDE/Od5ptGG1Z44tshpgX1waKFt26YG6dWdyuQxvVRip6RSKS/Bik9Iwe7J3rexUYnVzHbQgBpl0BXlK8rC+I22To/Z91bLGSzeXvc6nAEIT3tPeHK+AkBJp1iGSd++Ui/aEi16YKnJS2V7tWzo=
 before_install:
 - export PUBLISHABLE=${PUBLISHABLE:-true}
-- if [[ $(uname -s) == 'Linux' ]]; then export CXX="clang++-3.5"; export CC="clang-3.5";
-  export PYTHONPATH=$(pwd)/py-local/lib/python2.7/site-packages; else export PYTHONPATH=$(pwd)/py-local/lib/python/site-packages;
+- if [[ $(uname -s) == 'Linux' ]]; then
+    export CXX="clang++-3.5";
+    export CC="clang-3.5";
+    export PYTHONPATH=$(pwd)/py-local/lib/python2.7/site-packages;
+  else
+    export PYTHONPATH=$(pwd)/py-local/lib/python/site-packages;
   fi;
 - scripts/validate_tag.sh
 - source ./scripts/install_node.sh ${NODE_VERSION}
