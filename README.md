@@ -2,11 +2,14 @@
 
 node.js bindings for [hdr histogram][hdr] [C implementation][cimpl](version 0.9.3).
 
+[![Build status](https://ci.appveyor.com/api/projects/status/tgu1of6olrg64so4?svg=true)](https://ci.appveyor.com/project/mcollina/native-hdr-histogram)
+[![Build Status](https://travis-ci.org/mcollina/native-hdr-histogram.svg?branch=master)](https://travis-ci.org/mcollina/native-hdr-histogram)
+
 > HDR Histogram is designed for recoding histograms of value measurements
 in latency and performance sensitive applications. Measurements show
 value recording times as low as 3-6 nanoseconds on modern (circa 2014)
 Intel CPUs. A Histogram's memory footprint is constant, with no
-allocation operations involved in recording data values or in iterating through them. 
+allocation operations involved in recording data values or in iterating through them.
 - from [hdr histogram][hdr] website
 
 This library is blazingly fast, and you can use it to record
@@ -116,7 +119,7 @@ Return the standard deviation of the histogram.
 
 ### histogram.percentile(percentile)
 
-Returns the value at the given percentile. `percentile` must be > 
+Returns the value at the given percentile. `percentile` must be >
 0 and <= 100, otherwise it will throw.
 
 -------------------------------------------------------
