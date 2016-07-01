@@ -5,7 +5,7 @@ source ~/.nvm/nvm.sh
 set -e -u
 
 function publish() {
-    if [[ ${PUBLISHABLE:-false} == true ]] && [[ ${COMMIT_MESSAGE} =~ "[publish binary]" ]]; then
+    if [[ ${COMMIT_MESSAGE} == *"[publish binary]"* ]]; then
         node-pre-gyp package testpackage
         node-pre-gyp publish
         node-pre-gyp info
