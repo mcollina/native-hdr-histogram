@@ -35,7 +35,7 @@ follow the instructions at [node-gyp][node-gyp].
 ```js
 'use strict'
 
-const Histogram = require('./')
+const Histogram = require('native-hdr-histogram')
 const max = 1000000
 const key = 'record*' + max
 const histogram = new Histogram(1, 100)
