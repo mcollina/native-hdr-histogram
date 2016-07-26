@@ -167,8 +167,11 @@ is following the example set by their [node-sqlite3 library][sqlite3].
 ## License
 
 This library is licensed as MIT
+
 HdrHistogram_c is licensed as [BSD license][HdrHistogram_c-license]
+
 zlib is licensed as [zlib License][zlib-license]
+
 The scripts used in the scripts folder are modified [BSD licensed][sqlite3-scripts-license] scripts from the [node-sqlite3][sqlite3] libary.
 
 [hdr]: http://hdrhistogram.org/
