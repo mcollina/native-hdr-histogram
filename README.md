@@ -156,11 +156,30 @@ Returns a `Buffer` containing a serialized version of the histogram
 
 Reads a `Buffer` and deserialize an histogram.
 
+## Acknowledgements
+
+This project was kindly sponsored by [nearForm](http://nearform.com).
+
+The pre-compilation work of this project is only possible because of [mapbox's][mapbox]
+amazing work on [node-pre-gyp][node-pre-gyp]. A lot of the functionality enabled
+is following the example set by their [node-sqlite3 library][sqlite3].
+
 ## License
 
 This library is licensed as MIT
-HdrHistogram_c is licensed as BSD
+
+HdrHistogram_c is licensed as [BSD license][HdrHistogram_c-license]
+
+zlib is licensed as [zlib License][zlib-license]
+
+The scripts used in the scripts folder are modified [BSD licensed][sqlite3-scripts-license] scripts from the [node-sqlite3][sqlite3] libary.
 
 [hdr]: http://hdrhistogram.org/
 [cimpl]: https://github.com/HdrHistogram/HdrHistogram_c
 [node-gyp]: https://github.com/nodejs/node-gyp#installation
+[mapbox]: http://mapbox.com
+[node-pre-gyp]: https://github.com/mapbox/node-pre-gyp
+[sqlite3]: https://github.com/mapbox/node-sqlite3
+[HdrHistogram_c-license]: https://github.com/HdrHistogram/HdrHistogram_c/blob/master/LICENSE.txt
+[sqlite3-scripts-license]: https://github.com/mapbox/node-sqlite3/blob/master/LICENSE
+[zlib-license]: http://www.zlib.net/zlib_license.html
