@@ -91,13 +91,13 @@ NAN_METHOD(HdrHistogramWrap::Record) {
 NAN_METHOD(HdrHistogramWrap::Min) {
   HdrHistogramWrap* obj = Nan::ObjectWrap::Unwrap<HdrHistogramWrap>(info.This());
   int64_t value = hdr_min(obj->histogram);
-  info.GetReturnValue().Set((int32_t) value);
+  info.GetReturnValue().Set((double) value);
 }
 
 NAN_METHOD(HdrHistogramWrap::Max) {
   HdrHistogramWrap* obj = Nan::ObjectWrap::Unwrap<HdrHistogramWrap>(info.This());
   int64_t value = hdr_max(obj->histogram);
-  info.GetReturnValue().Set((int32_t) value);
+  info.GetReturnValue().Set((double) value);
 }
 
 NAN_METHOD(HdrHistogramWrap::Mean) {

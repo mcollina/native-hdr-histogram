@@ -116,3 +116,23 @@ test('percentiles', (t) => {
   }], 'percentiles matches')
   t.end()
 })
+
+test('support >2e9', (t) => {
+  const recordValue = 4 * 1e9
+  const instance = Histogram(1, recordValue)
+  var compare = (a, b) => {
+    var diff = Math.abs(a - b)
+    // hdr_min and hdr_max do not return precise data, even before
+    // conversion to double.
+    if (diff < 1e-3 * Math.min(Math.abs(a), Math.abs(b))) {
+      return true
+    } else {
+      console.error(`Mismatch! Got ${a}, expected ${b}!`)
+      return false
+    }
+  }
+  t.ok(instance.record(recordValue))
+  t.ok(compare(instance.min(), recordValue), 'min match')
+  t.ok(compare(instance.max(), recordValue), 'max match')
+  t.end()
+})
