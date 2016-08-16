@@ -135,4 +135,4 @@ test('support >2e9', (t) => {
   t.ok(compare(instance.min(), recordValue), 'min match')
   t.ok(compare(instance.max(), recordValue), 'max match')
   t.end()
-});
+})
