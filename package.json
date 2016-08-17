@@ -1,6 +1,6 @@
 {
   "name": "native-hdr-histogram",
-  "version": "0.3.4",
+  "version": "0.3.5",
   "description": "node.js bindings for hdr histogram C implementation",
   "main": "histogram.js",
   "gypfile": "true",
