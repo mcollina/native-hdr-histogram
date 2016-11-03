@@ -191,5 +191,5 @@ NAN_METHOD(HdrHistogramWrap::Percentiles) {
 NAN_METHOD(HdrHistogramWrap::Reset) {
   HdrHistogramWrap* obj = Nan::ObjectWrap::Unwrap<HdrHistogramWrap>(info.This());
   hdr_reset(obj->histogram);
-  info.GetReturnValue().Set(true);
+  info.GetReturnValue().Set(info.This());
 }

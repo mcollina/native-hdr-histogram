@@ -156,5 +156,8 @@ test('reset histogram', (t) => {
   t.equal(instance.max(), 55, 'max is correct after reset')
   t.equal(instance.mean(), 53.5, 'mean is correct after reset')
   t.equal(instance.stddev(), 1.5, 'stdev is correct after reset')
+  // test to ensure maintains ref to self when returning after reset
+  var resetInstance = instance.reset()
+  t.equal(instance, resetInstance)
   t.end()
 })
