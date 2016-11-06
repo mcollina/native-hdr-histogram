@@ -24,6 +24,7 @@ class HdrHistogramWrap : public Nan::ObjectWrap {
   static void Encode(const Nan::FunctionCallbackInfo<v8::Value>& info);
   static void Decode(const Nan::FunctionCallbackInfo<v8::Value>& info);
   static void Percentiles(const Nan::FunctionCallbackInfo<v8::Value>& info);
+  static void Reset(const Nan::FunctionCallbackInfo<v8::Value>& info);
 
   static Nan::Persistent<v8::Function> constructor;
 

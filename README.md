@@ -64,6 +64,7 @@ console.log(histogram.percentiles())
   * <a href="#percentiles"><code>histogram#<b>percentiles()</b></code></a>
   * <a href="#encode"><code>histogram#<b>encode()</b></code></a>
   * <a href="#decode"><code>histogram#<b>decode()</b></code></a>
+  * <a href="#reset"><code>histogram#<b>reset()</b></code></a>
 
 -------------------------------------------------------
 <a name="histogram"></a>
@@ -155,6 +156,13 @@ Returns a `Buffer` containing a serialized version of the histogram
 ### histogram.decode(buf)
 
 Reads a `Buffer` and deserialize an histogram.
+
+-------------------------------------------------------
+<a name="reset"></a>
+
+### histogram.reset()
+
+Resets the histogram so it can be reused.
 
 ## Acknowledgements
 

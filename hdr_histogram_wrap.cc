@@ -22,6 +22,7 @@ NAN_MODULE_INIT(HdrHistogramWrap::Init) {
   Nan::SetPrototypeMethod(tpl, "encode", Encode);
   Nan::SetMethod(tpl, "decode", Decode);
   Nan::SetPrototypeMethod(tpl, "percentiles", Percentiles);
+  Nan::SetPrototypeMethod(tpl, "reset", Reset);
 
   constructor.Reset(Nan::GetFunction(tpl).ToLocalChecked());
   Nan::Set(target, Nan::New("HdrHistogram").ToLocalChecked(), Nan::GetFunction(tpl).ToLocalChecked());
@@ -185,4 +186,10 @@ NAN_METHOD(HdrHistogramWrap::Percentiles) {
   }
 
   info.GetReturnValue().Set(result);
+}
+
+NAN_METHOD(HdrHistogramWrap::Reset) {
+  HdrHistogramWrap* obj = Nan::ObjectWrap::Unwrap<HdrHistogramWrap>(info.This());
+  hdr_reset(obj->histogram);
+  info.GetReturnValue().Set(info.This());
 }
