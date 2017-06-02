@@ -1,6 +1,6 @@
 {
   "name": "native-hdr-histogram",
-  "version": "0.4.4",
+  "version": "0.4.5",
   "description": "node.js bindings for hdr histogram C implementation",
   "main": "histogram.js",
   "gypfile": "true",
@@ -9,7 +9,9 @@
     "install": "node-pre-gyp install --fallback-to-build",
     "test": "node-pre-gyp install --fallback-to-build && standard && tap test.js"
   },
-  "precommit": ["test"],
+  "precommit": [
+    "test"
+  ],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/mcollina/native-hdr-histogram.git"
@@ -35,11 +37,11 @@
     "tap": "^5.7.0"
   },
   "binary": {
-    "module_name" : "histogram",
-    "module_path" : "./lib/binding/{node_abi}-{platform}-{arch}",
-    "remote_path" : "./{name}/v{version}/{toolset}/",
+    "module_name": "histogram",
+    "module_path": "./lib/binding/{node_abi}-{platform}-{arch}",
+    "remote_path": "./{name}/v{version}/{toolset}/",
     "package_name": "{node_abi}-{platform}-{arch}.tar.gz",
-    "host"        : "https://autocannon-assets.s3-eu-west-1.amazonaws.com"
+    "host": "https://autocannon-assets.s3-eu-west-1.amazonaws.com"
   },
   "dependencies": {
     "nan": "^2.3.0",
