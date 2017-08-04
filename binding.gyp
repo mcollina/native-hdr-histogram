@@ -12,6 +12,7 @@
         "hdr_histogram_wrap.cc",
         "histogram.cc"
       ],
+      'defines': [ 'NAPI_CPP_EXCEPTIONS' ],
       "include_dirs": [
         "<!@(node -p \"require('node-addon-api').include\")",
         "src/"
