@@ -2,8 +2,6 @@
   "targets": [
     {
       "target_name": "native-hdr-histogram",
-      "cflags!": [ "-fno-exceptions" ],
-      "cflags_cc!": [ "-fno-exceptions" ],
       "sources": [
         "src/hdr_encoding.h",
         "src/hdr_encoding.c",
