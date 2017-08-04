@@ -1,8 +1,9 @@
-#include <nan.h>
+#include <napi.h>
+#include <uv.h>
 #include "hdr_histogram_wrap.h"
 
-NAN_MODULE_INIT(InitAll) {
-  HdrHistogramWrap::Init(target);
+void InitAll(Napi::Env env, Napi::Object exports, Napi::Object module) {
+  HdrHistogramWrap::Init(env, exports);
 }
 
-NODE_MODULE(Histogram, InitAll)
+NODE_API_MODULE(Histogram, InitAll)

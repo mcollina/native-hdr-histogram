@@ -1,8 +1,4 @@
 'use strict'
 
-const binary = require('node-pre-gyp')
-const path = require('path')
-const binding_path = binary.find(path.resolve(path.join(__dirname, './package.json')))
-const binding = require(binding_path)
-
+var binding = require('bindings')('native-hdr-histogram.node')
 module.exports = binding.HdrHistogram

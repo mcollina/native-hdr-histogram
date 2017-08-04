@@ -39,3 +39,5 @@ zlib/zlib.sln
 zlib/zlib.vcxproj
 zlib/zlib.vcxproj.filters
 lib/binding
+
+package-lock.json

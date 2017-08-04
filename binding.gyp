@@ -1,7 +1,9 @@
 {
   "targets": [
     {
-      "target_name": "<(module_name)",
+      "target_name": "native-hdr-histogram",
+      "cflags!": [ "-fno-exceptions" ],
+      "cflags_cc!": [ "-fno-exceptions" ],
       "sources": [
         "src/hdr_encoding.h",
         "src/hdr_encoding.c",
@@ -12,24 +14,22 @@
         "hdr_histogram_wrap.cc",
         "histogram.cc"
       ],
-      "dependencies": [
-        "<(module_root_dir)/zlib/zlib.gyp:zlib"
-      ],
       "include_dirs": [
-        "<!(node -e \"require('nan')\")",
+        "<!@(node -p \"require('node-addon-api').include\")",
         "src/"
-      ]
-    },
-    {
-      "target_name": "action_after_build",
-      "type": "none",
-      "dependencies": [ "<(module_name)" ],
-      "copies": [
-        {
-          "files": [ "<(PRODUCT_DIR)/<(module_name).node" ],
-          "destination": "<(module_path)"
-        }
-      ]
+      ],
+      "dependencies": [
+        "<(module_root_dir)/zlib/zlib.gyp:zlib",
+        "<!(node -p \"require('node-addon-api').gyp\")"
+      ],
+      'xcode_settings': {
+        'GCC_ENABLE_CPP_EXCEPTIONS': 'YES',
+        'CLANG_CXX_LIBRARY': 'libc++',
+        'MACOSX_DEPLOYMENT_TARGET': '10.7',
+      },
+      'msvs_settings': {
+        'VCCLCompilerTool': { 'ExceptionHandling': 1 },
+      }
     }
   ]
 }

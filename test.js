@@ -3,24 +3,19 @@
 const test = require('tap').test
 const Histogram = require('./')
 
-test('create an histogram', (t) => {
-  t.doesNotThrow(() => Histogram(1, 100))
-  t.end()
-})
-
 test('create an histogram with a constructor', (t) => {
   t.doesNotThrow(() => new Histogram(1, 100))
   t.end()
 })
 
 test('create an histogram arguments checks', (t) => {
-  t.throws(() => Histogram(-1, 100))
-  t.throws(() => Histogram(0, 100))
-  t.throws(() => Histogram(1, 100, 20))
-  t.throws(() => Histogram(1, 100, 0))
-  t.throws(() => Histogram(1, 100, 6))
+  t.throws(() => new Histogram(-1, 100))
+  t.throws(() => new Histogram(0, 100))
+  t.throws(() => new Histogram(1, 100, 20))
+  t.throws(() => new Histogram(1, 100, 0))
+  t.throws(() => new Histogram(1, 100, 6))
   for (let i = 1; i < 5; i++) {
-    t.doesNotThrow(() => Histogram(1, 100, i))
+    t.doesNotThrow(() => new Histogram(1, 100, i))
   }
   t.end()
 })
@@ -33,14 +28,14 @@ test('record values in an histogram', (t) => {
 })
 
 test('recording a non-value returns false', (t) => {
-  const instance = Histogram(1, 100)
+  const instance = new Histogram(1, 100)
   t.notOk(instance.record())
   t.notOk(instance.record(-42))
   t.end()
 })
 
 test('stdev, mean, min, max', (t) => {
-  const instance = Histogram(1, 100)
+  const instance = new Histogram(1, 100)
   t.ok(instance.record(42))
   t.ok(instance.record(45))
   t.equal(instance.min(), 42, 'min is available')
@@ -51,7 +46,7 @@ test('stdev, mean, min, max', (t) => {
 })
 
 test('percentile', (t) => {
-  const instance = Histogram(1, 100)
+  const instance = new Histogram(1, 100)
   t.ok(instance.record(42))
   t.ok(instance.record(42))
   t.ok(instance.record(45))
@@ -62,7 +57,7 @@ test('percentile', (t) => {
 })
 
 test('wrong percentile', (t) => {
-  const instance = Histogram(1, 100)
+  const instance = new Histogram(1, 100)
   t.ok(instance.record(42))
   t.ok(instance.record(42))
   t.ok(instance.record(45))
@@ -74,7 +69,7 @@ test('wrong percentile', (t) => {
 })
 
 test('encode/decode', (t) => {
-  const instance = Histogram(1, 100)
+  const instance = new Histogram(1, 100)
   t.ok(instance.record(42))
   t.ok(instance.record(42))
   t.ok(instance.record(45))
@@ -93,7 +88,7 @@ test('fail decode', (t) => {
 })
 
 test('percentiles', (t) => {
-  const instance = Histogram(1, 100)
+  const instance = new Histogram(1, 100)
   t.deepEqual(instance.percentiles(), [{
     percentile: 100,
     value: 0
@@ -119,7 +114,7 @@ test('percentiles', (t) => {
 
 test('support >2e9', (t) => {
   const recordValue = 4 * 1e9
-  const instance = Histogram(1, recordValue)
+  const instance = new Histogram(1, recordValue)
   var compare = (a, b) => {
     var diff = Math.abs(a - b)
     // hdr_min and hdr_max do not return precise data, even before

@@ -1,4 +1,4 @@
-#include <nan.h>
+#include <napi.h>
 #include "hdr_histogram_wrap.h"
 
 extern "C" {
@@ -6,26 +6,55 @@ extern "C" {
 #include "hdr_histogram_log.h"
 }
 
-Nan::Persistent<v8::Function> HdrHistogramWrap::constructor;
+Napi::FunctionReference HdrHistogramWrap::constructor;
 
-NAN_MODULE_INIT(HdrHistogramWrap::Init) {
-  v8::Local<v8::FunctionTemplate> tpl = Nan::New<v8::FunctionTemplate>(New);
-  tpl->SetClassName(Nan::New("HdrHistogram").ToLocalChecked());
-  tpl->InstanceTemplate()->SetInternalFieldCount(1);
+void HdrHistogramWrap::Init(Napi::Env env, Napi::Object target) {
+  Napi::HandleScope scope(env);
 
-  Nan::SetPrototypeMethod(tpl, "record", Record);
-  Nan::SetPrototypeMethod(tpl, "min", Min);
-  Nan::SetPrototypeMethod(tpl, "max", Max);
-  Nan::SetPrototypeMethod(tpl, "mean", Mean);
-  Nan::SetPrototypeMethod(tpl, "stddev", Stddev);
-  Nan::SetPrototypeMethod(tpl, "percentile", Percentile);
-  Nan::SetPrototypeMethod(tpl, "encode", Encode);
-  Nan::SetMethod(tpl, "decode", Decode);
-  Nan::SetPrototypeMethod(tpl, "percentiles", Percentiles);
-  Nan::SetPrototypeMethod(tpl, "reset", Reset);
+  Napi::Function ctor = DefineClass(env, "HdrHistogram", {
+    InstanceMethod("record", &HdrHistogramWrap::Record),
+    InstanceMethod("min", &HdrHistogramWrap::Min),
+    InstanceMethod("max", &HdrHistogramWrap::Max),
+    InstanceMethod("mean", &HdrHistogramWrap::Mean),
+    InstanceMethod("stddev", &HdrHistogramWrap::Stddev),
+    InstanceMethod("percentile", &HdrHistogramWrap::Percentile),
+    InstanceMethod("encode", &HdrHistogramWrap::Encode),
+    InstanceMethod("percentiles", &HdrHistogramWrap::Percentiles),
+    InstanceMethod("reset", &HdrHistogramWrap::Reset),
+    StaticMethod("decode", &HdrHistogramWrap::Decode)
+  });
 
-  constructor.Reset(Nan::GetFunction(tpl).ToLocalChecked());
-  Nan::Set(target, Nan::New("HdrHistogram").ToLocalChecked(), Nan::GetFunction(tpl).ToLocalChecked());
+  constructor = Napi::Persistent(ctor);
+  constructor.SuppressDestruct();
+
+  target.Set("HdrHistogram", ctor);
+}
+
+HdrHistogramWrap::HdrHistogramWrap(const Napi::CallbackInfo& info) : Napi::ObjectWrap<HdrHistogramWrap>(info) {
+  int64_t lowest = info[0].IsUndefined() ? 1 : info[0].As<Napi::Number>().Int64Value();
+  int64_t highest = info[1].IsUndefined() ? 100 : info[1].As<Napi::Number>().Int64Value();
+  int significant_figures = info[2].IsUndefined() ? 3 : info[2].As<Napi::Number>().Int32Value();
+
+  if (lowest <= 0) {
+    Napi::Error::New(info.Env(), "The lowest trackable number must be greater than 0").ThrowAsJavaScriptException();
+    return
+  }
+
+  if (significant_figures < 1 || significant_figures > 5) {
+    Napi::Error::New(info.Env(), "The significant figures must be between 1 and 5 (inclusive)").ThrowAsJavaScriptException();
+    return
+  }
+
+  int init_result = hdr_init(
+      lowest,
+      highest,
+      significant_figures,
+      &this->histogram);
+
+  if (init_result != 0) {
+    Napi::Error::New(info.Env(), "Unable to initialize the Histogram").ThrowAsJavaScriptException();
+    return
+  }
 }
 
 HdrHistogramWrap::~HdrHistogramWrap() {
@@ -34,135 +63,92 @@ HdrHistogramWrap::~HdrHistogramWrap() {
   }
 }
 
-NAN_METHOD(HdrHistogramWrap::New) {
-  if (info.IsConstructCall()) {
-    int64_t lowest = info[0]->IsUndefined() ? 1 : Nan::To<int64_t>(info[0]).FromJust();
-    int64_t highest = info[1]->IsUndefined() ? 100 : Nan::To<int64_t>(info[1]).FromJust();
-    int significant_figures = info[2]->IsUndefined() ? 3 : Nan::To<int>(info[2]).FromJust();
-
-    if (lowest <= 0) {
-      return Nan::ThrowError("The lowest trackable number must be greater than 0");
-    }
-
-    if (significant_figures < 1 || significant_figures > 5) {
-      return Nan::ThrowError("The significant figures must be between 1 and 5 (inclusive)");
-    }
-
-    HdrHistogramWrap *obj = new HdrHistogramWrap();
-
-    int init_result = hdr_init(
-        lowest,
-        highest,
-        significant_figures,
-        &obj->histogram);
-
-    if (init_result != 0) {
-      delete obj;
-      return Nan::ThrowError("Unable to initialize the Histogram");
-    }
-
-    obj->Wrap(info.This());
-    info.GetReturnValue().Set(info.This());
-  } else {
-    const int argc = 3;
-    v8::Local<v8::Value> argv[argc] = {
-      info[0],
-      info[1],
-      info[2]
-    };
-    v8::Local<v8::Function> cons = Nan::New(constructor);
-    info.GetReturnValue().Set(cons->NewInstance(argc, argv));
-  }
-}
-
-NAN_METHOD(HdrHistogramWrap::Record) {
+Napi::Value HdrHistogramWrap::Record(const Napi::CallbackInfo& info) {
   int64_t value;
-  HdrHistogramWrap* obj = Nan::ObjectWrap::Unwrap<HdrHistogramWrap>(info.This());
+  HdrHistogramWrap* obj = this;
 
-  if (info[0]->IsUndefined()) {
-    info.GetReturnValue().Set(false);
-    return;
+  if (info[0].IsUndefined()) {
+    return Napi::Boolean::New(info.Env(), false);
   }
 
-  value = Nan::To<int64_t>(info[0]).FromJust();
+  value = info[0].As<Napi::Number>().Int64Value();
   bool result = hdr_record_value(obj->histogram, value);
-  info.GetReturnValue().Set(result);
+  return Napi::Boolean::New(info.Env(), result);
 }
 
-NAN_METHOD(HdrHistogramWrap::Min) {
-  HdrHistogramWrap* obj = Nan::ObjectWrap::Unwrap<HdrHistogramWrap>(info.This());
+Napi::Value HdrHistogramWrap::Min(const Napi::CallbackInfo& info) {
+  HdrHistogramWrap* obj = this;
   int64_t value = hdr_min(obj->histogram);
-  info.GetReturnValue().Set((double) value);
+  return Napi::Number::New(info.Env(), (double) value);
 }
 
-NAN_METHOD(HdrHistogramWrap::Max) {
-  HdrHistogramWrap* obj = Nan::ObjectWrap::Unwrap<HdrHistogramWrap>(info.This());
+Napi::Value HdrHistogramWrap::Max(const Napi::CallbackInfo& info) {
+  HdrHistogramWrap* obj = this;
   int64_t value = hdr_max(obj->histogram);
-  info.GetReturnValue().Set((double) value);
+  return Napi::Number::New(info.Env(), (double) value);
 }
 
-NAN_METHOD(HdrHistogramWrap::Mean) {
-  HdrHistogramWrap* obj = Nan::ObjectWrap::Unwrap<HdrHistogramWrap>(info.This());
+Napi::Value HdrHistogramWrap::Mean(const Napi::CallbackInfo& info) {
+  HdrHistogramWrap* obj = this;
   double value = hdr_mean(obj->histogram);
-  info.GetReturnValue().Set(value);
+  return Napi::Number::New(info.Env(), value);
 }
 
-NAN_METHOD(HdrHistogramWrap::Stddev) {
-  HdrHistogramWrap* obj = Nan::ObjectWrap::Unwrap<HdrHistogramWrap>(info.This());
+Napi::Value HdrHistogramWrap::Stddev(const Napi::CallbackInfo& info) {
+  HdrHistogramWrap* obj = this;
   double value = hdr_stddev(obj->histogram);
-  info.GetReturnValue().Set(value);
+  return Napi::Number::New(info.Env(), value);
 }
 
-NAN_METHOD(HdrHistogramWrap::Percentile) {
-  if (info[0]->IsUndefined()) {
-    return Nan::ThrowError("No percentile specified");
+Napi::Value HdrHistogramWrap::Percentile(const Napi::CallbackInfo& info) {
+  if (info[0].IsUndefined()) {
+    Napi::Error::New(info.Env(), "No percentile specified").ThrowAsJavaScriptException();
   }
 
-  double percentile = Nan::To<double>(info[0]).FromJust();
+  double percentile = info[0].As<Napi::Number>().DoubleValue();
 
   if (percentile <= 0.0 || percentile > 100.0) {
-    return Nan::ThrowError("percentile must be > 0 and <= 100");
+    Napi::Error::New(info.Env(), "percentile must be > 0 and <= 100").ThrowAsJavaScriptException();
   }
 
-  HdrHistogramWrap* obj = Nan::ObjectWrap::Unwrap<HdrHistogramWrap>(info.This());
+  HdrHistogramWrap* obj = this;
   double value = hdr_value_at_percentile(obj->histogram, percentile);
-  info.GetReturnValue().Set(value);
+  return Napi::Number::New(info.Env(), value);
 }
 
-NAN_METHOD(HdrHistogramWrap::Encode) {
-  HdrHistogramWrap* obj = Nan::ObjectWrap::Unwrap<HdrHistogramWrap>(info.This());
+Napi::Value HdrHistogramWrap::Encode(const Napi::CallbackInfo& info) {
+  HdrHistogramWrap* obj = this;
   char *encoded;
   int result = hdr_log_encode(obj->histogram, &encoded);
   if (result != 0) {
-    return Nan::ThrowError("failed to encode");
+    Napi::Error::New(info.Env(), "failed to encode").ThrowAsJavaScriptException();
   }
   int len = strlen(encoded);
-  Nan::MaybeLocal<v8::Object> buf = Nan::NewBuffer(encoded, len);
-  info.GetReturnValue().Set(buf.ToLocalChecked());
+  return Napi::Buffer<char>::New(info.Env(), encoded, len);
 }
 
-NAN_METHOD(HdrHistogramWrap::Decode) {
-  v8::Local<v8::Value> buf;
-  if (info.Length() > 0 && info[0]->IsObject(), node::Buffer::HasInstance(info[0])) {
+Napi::Value HdrHistogramWrap::Decode(const Napi::CallbackInfo& info) {
+  Napi::Value buf;
+  if (info.Length() > 0 && info[0].IsObject(), info[0].IsBuffer()) {
     buf = info[0];
   } else {
-    return Nan::ThrowError("Missing Buffer");
+    Napi::Error::New(info.Env(), "Missing Buffer").ThrowAsJavaScriptException();
   }
-  char *encoded = node::Buffer::Data(buf);
-  size_t len  = node::Buffer::Length(buf);
-  const int argc = 0;
-  v8::Local<v8::Function> cons = Nan::New(constructor);
-  v8::Local<v8::Object> wrap = cons->NewInstance(argc, NULL);
-  HdrHistogramWrap* obj = Nan::ObjectWrap::Unwrap<HdrHistogramWrap>(wrap);
+  char *encoded = buf.As<Napi::Buffer<char>>().Data();
+  size_t len  = buf.As<Napi::Buffer<char>>().Length();
+
+  Napi::Object wrap = constructor.New(std::initializer_list<napi_value>{});
+  HdrHistogramWrap* obj = HdrHistogramWrap::Unwrap(wrap);
 
   hdr_log_decode(&obj->histogram, encoded, len);
 
-  info.GetReturnValue().Set(wrap);
+  return wrap;
 }
 
-NAN_METHOD(HdrHistogramWrap::Percentiles) {
-  HdrHistogramWrap* obj = Nan::ObjectWrap::Unwrap<HdrHistogramWrap>(info.This());
-  v8::Local<v8::Array> result = Nan::New<v8::Array>();
+Napi::Value HdrHistogramWrap::Percentiles(const Napi::CallbackInfo& info) {
+  HdrHistogramWrap* obj = this;
+  Napi::Env env = info.Env();
+  Napi::Array result = Napi::Array::New(env);
 
   hdr_iter iter;
   hdr_iter_percentile_init(&iter, obj->histogram, 1);
@@ -170,26 +156,22 @@ NAN_METHOD(HdrHistogramWrap::Percentiles) {
   int count = 0;
 
   while(hdr_iter_next(&iter)) {
-    v8::Local<v8::Object> percentile = Nan::New<v8::Object>();
+    Napi::Object percentile = Napi::Object::New(env);
 
-    Nan::Set(
-        percentile,
-        Nan::New("percentile").ToLocalChecked(),
-        Nan::New(iter.specifics.percentiles.percentile));
+    percentile.Set(Napi::String::New(env, "percentile"),
+        Napi::Number::New(env, iter.specifics.percentiles.percentile));
 
-    Nan::Set(
-        percentile,
-        Nan::New("value").ToLocalChecked(),
-        Nan::New((double) iter.value));
+    percentile.Set(Napi::String::New(env, "value"),
+        Napi::Number::New(env, (double) iter.value));
 
-    Nan::Set(result, count++, percentile);
+    result.Set(count++, percentile);
   }
 
-  info.GetReturnValue().Set(result);
+  return result;
 }
 
-NAN_METHOD(HdrHistogramWrap::Reset) {
-  HdrHistogramWrap* obj = Nan::ObjectWrap::Unwrap<HdrHistogramWrap>(info.This());
+Napi::Value HdrHistogramWrap::Reset(const Napi::CallbackInfo& info) {
+  HdrHistogramWrap* obj = this;
   hdr_reset(obj->histogram);
-  info.GetReturnValue().Set(info.This());
+  return info.This();
 }
