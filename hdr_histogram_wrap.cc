@@ -31,18 +31,19 @@ void HdrHistogramWrap::Init(Napi::Env env, Napi::Object target) {
 }
 
 HdrHistogramWrap::HdrHistogramWrap(const Napi::CallbackInfo& info) : Napi::ObjectWrap<HdrHistogramWrap>(info) {
+  Napi::Env env = info.Env();
+  Napi::HandleScope scope(env);
+
   int64_t lowest = info[0].IsUndefined() ? 1 : info[0].As<Napi::Number>().Int64Value();
   int64_t highest = info[1].IsUndefined() ? 100 : info[1].As<Napi::Number>().Int64Value();
   int significant_figures = info[2].IsUndefined() ? 3 : info[2].As<Napi::Number>().Int32Value();
 
   if (lowest <= 0) {
-    Napi::Error::New(info.Env(), "The lowest trackable number must be greater than 0").ThrowAsJavaScriptException();
-    return
+    throw Napi::Error::New(env, "The lowest trackable number must be greater than 0");
   }
 
   if (significant_figures < 1 || significant_figures > 5) {
-    Napi::Error::New(info.Env(), "The significant figures must be between 1 and 5 (inclusive)").ThrowAsJavaScriptException();
-    return
+    throw Napi::Error::New(env, "The significant figures must be between 1 and 5 (inclusive)");
   }
 
   int init_result = hdr_init(
@@ -52,8 +53,7 @@ HdrHistogramWrap::HdrHistogramWrap(const Napi::CallbackInfo& info) : Napi::Objec
       &this->histogram);
 
   if (init_result != 0) {
-    Napi::Error::New(info.Env(), "Unable to initialize the Histogram").ThrowAsJavaScriptException();
-    return
+    throw Napi::Error::New(env, "Unable to initialize the Histogram");
   }
 }
 
@@ -132,8 +132,9 @@ Napi::Value HdrHistogramWrap::Decode(const Napi::CallbackInfo& info) {
   if (info.Length() > 0 && info[0].IsObject(), info[0].IsBuffer()) {
     buf = info[0];
   } else {
-    Napi::Error::New(info.Env(), "Missing Buffer").ThrowAsJavaScriptException();
+    throw Napi::Error::New(info.Env(), "Missing Buffer");
   }
+
   char *encoded = buf.As<Napi::Buffer<char>>().Data();
   size_t len  = buf.As<Napi::Buffer<char>>().Length();
 
