@@ -7,7 +7,8 @@
   "scripts": {
     "prepublish": "npm ls",
     "install": "node-pre-gyp install --fallback-to-build",
-    "test": "node-pre-gyp install --fallback-to-build && standard && tap test.js"
+    "build": "node-pre-gyp rebuild",
+    "test": "standard && tap test.js"
   },
   "precommit": [
     "test"
@@ -31,10 +32,10 @@
   },
   "homepage": "https://github.com/mcollina/native-hdr-histogram#readme",
   "devDependencies": {
-    "aws-sdk": "2.x",
+    "aws-sdk": "^2.312.0",
     "pre-commit": "^1.1.2",
-    "standard": "^6.0.7",
-    "tap": "^5.7.0"
+    "standard": "^12.0.1",
+    "tap": "^12.0.1"
   },
   "binary": {
     "module_name": "histogram",
