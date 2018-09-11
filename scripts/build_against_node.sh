@@ -13,7 +13,7 @@ function publish() {
     fi
 }
 
-npm install --build-from-source  --clang=1
+npm install --build-from-source
 npm test
 
 publish
