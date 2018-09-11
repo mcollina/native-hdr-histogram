@@ -71,7 +71,13 @@ NAN_METHOD(HdrHistogramWrap::New) {
       info[2]
     };
     v8::Local<v8::Function> cons = Nan::New(constructor);
-    info.GetReturnValue().Set(cons->NewInstance(argc, argv));
+    v8::MaybeLocal<v8::Object> wrap = Nan::NewInstance(cons, argc, argv);
+
+    if (wrap.IsEmpty()) {
+      return;
+    }
+
+    info.GetReturnValue().Set(wrap.ToLocalChecked());
   }
 }
 
@@ -152,7 +158,8 @@ NAN_METHOD(HdrHistogramWrap::Decode) {
   size_t len  = node::Buffer::Length(buf);
   const int argc = 0;
   v8::Local<v8::Function> cons = Nan::New(constructor);
-  v8::Local<v8::Object> wrap = cons->NewInstance(argc, NULL);
+  v8::Local<v8::Object> wrap = Nan::NewInstance(cons, argc, NULL).ToLocalChecked();
+
   HdrHistogramWrap* obj = Nan::ObjectWrap::Unwrap<HdrHistogramWrap>(wrap);
 
   hdr_log_decode(&obj->histogram, encoded, len);
