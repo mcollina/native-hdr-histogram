@@ -7,7 +7,7 @@ ECHO ~~~~~~~~~~~~~~~~~~~~~~~~~~~~ %~f0 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 SET PATH=%CD%;%PATH%
 
 ECHO downloading/installing node
-powershell Install-Product node $env:nodejs_version $env:platform
+powershell Update-NodeJsInstallation (Get-NodeJsLatestBuild $env:nodejs_version) $env:PLATFORM
 IF %ERRORLEVEL% NEQ 0 GOTO ERROR
 
 ECHO node^: && call node -v
