@@ -54,6 +54,12 @@ void hdr_gettime(hdr_timespec* ts)
     ts->tv_nsec = mts.tv_nsec;
 }
 
+
+void hdr_getnow(hdr_timespec* ts)
+{
+    hdr_gettime(ts);
+}
+
 #elif defined(__linux__) || defined(__CYGWIN__)
 
 
@@ -62,9 +68,31 @@ void hdr_gettime(hdr_timespec* t)
     clock_gettime(CLOCK_MONOTONIC, (struct timespec*)t);
 }
 
+void hdr_getnow(hdr_timespec* t)
+{
+    clock_gettime(CLOCK_REALTIME, (struct timespec*)t);
+}
+
 #else
 
 #warning "Platform not supported\n"
 
 #endif
+
+double hdr_timespec_as_double(const hdr_timespec* t)
+{
+    double d = t->tv_sec;
+    return d + (t->tv_nsec / 1000000000.0);
+}
+
+void hdr_timespec_from_double(hdr_timespec* t, double value)
+{
+    int seconds = (int) value;
+    int milliseconds = (int) round((value - seconds) * 1000);
+
+    t->tv_sec = seconds;
+    t->tv_nsec = milliseconds * 1000000;
+}
+
+
 

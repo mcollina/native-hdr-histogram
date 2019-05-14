@@ -5,17 +5,8 @@
  */
 
 #include <stdint.h>
-#include <stdlib.h>
 #include <stdbool.h>
-#include <stdlib.h>
 #include <errno.h>
-
-#if defined(_MSC_VER)
-#include <WinSock2.h>
-#else
-#include <unistd.h>
-#include <sched.h>
-#endif
 
 #include "hdr_atomic.h"
 #include "hdr_thread.h"
@@ -39,6 +30,7 @@ static int64_t _hdr_phaser_reset_epoch(int64_t* field, int64_t initial_value)
 
 int hdr_writer_reader_phaser_init(struct hdr_writer_reader_phaser* p)
 {
+    int rc;
     if (NULL == p)
     {
         return EINVAL;
@@ -47,27 +39,28 @@ int hdr_writer_reader_phaser_init(struct hdr_writer_reader_phaser* p)
     p->start_epoch = 0;
     p->even_end_epoch = 0;
     p->odd_end_epoch = INT64_MIN;
-	p->reader_mutex = hdr_mutex_alloc();
+    p->reader_mutex = hdr_mutex_alloc();
 
     if (!p->reader_mutex)
     {
         return ENOMEM;
     }
 
-    int rc = hdr_mutex_init(p->reader_mutex);
+    rc = hdr_mutex_init(p->reader_mutex);
     if (0 != rc)
     {
         return rc;
     }
 
-    // TODO: Should I fence here.
+    /* TODO: Should I fence here. */
 
     return 0;
 }
 
-void hdr_writer_reader_phaser_destory(struct hdr_writer_reader_phaser* p)
+void hdr_writer_reader_phaser_destroy(struct hdr_writer_reader_phaser* p)
 {
     hdr_mutex_destroy(p->reader_mutex);
+    hdr_mutex_free(p->reader_mutex);
 }
 
 int64_t hdr_phaser_writer_enter(struct hdr_writer_reader_phaser* p)
@@ -96,13 +89,16 @@ void hdr_phaser_reader_unlock(struct hdr_writer_reader_phaser* p)
 void hdr_phaser_flip_phase(
     struct hdr_writer_reader_phaser* p, int64_t sleep_time_ns)
 {
-    // TODO: is_held_by_current_thread
+    bool caught_up;
+    int64_t start_value_at_flip;
+    /* TODO: is_held_by_current_thread */
+    unsigned int sleep_time_us = sleep_time_ns < 1000000000 ? (unsigned int) (sleep_time_ns / 1000) : 1000000;
 
     int64_t start_epoch = _hdr_phaser_get_epoch(&p->start_epoch);
 
     bool next_phase_is_even = (start_epoch < 0);
 
-    // Clear currently used phase end epoch.
+    /* Clear currently used phase end epoch.*/
     int64_t initial_start_value;
     if (next_phase_is_even)
     {
@@ -115,39 +111,25 @@ void hdr_phaser_flip_phase(
         _hdr_phaser_set_epoch(&p->odd_end_epoch, initial_start_value);
     }
 
-    // Reset start value, indicating new phase.
-    int64_t start_value_at_flip = 
-        _hdr_phaser_reset_epoch(&p->start_epoch, initial_start_value);
+    /* Reset start value, indicating new phase.*/
+    start_value_at_flip = _hdr_phaser_reset_epoch(&p->start_epoch, initial_start_value);
 
-    bool caught_up = false;
     do
     {
-        int64_t* end_epoch = 
+        int64_t* end_epoch =
             next_phase_is_even ? &p->odd_end_epoch : &p->even_end_epoch;
 
         caught_up = _hdr_phaser_get_epoch(end_epoch) == start_value_at_flip;
 
         if (!caught_up)
         {
-            if (sleep_time_ns == 0)
+            if (sleep_time_us <= 0)
             {
-#if defined(_MSC_VER)
-				Sleep(0);
-#else
-                sched_yield();
-#endif
+                hdr_yield();
             }
             else
             {
-#if defined(_MSC_VER)
-				struct timeval tv;
-
-				tv.tv_sec = (long)sleep_time_ns / 1000000;
-				tv.tv_usec = sleep_time_ns % 1000000;				
-				select(0, NULL, NULL, NULL, &tv);
-#else
-                usleep(sleep_time_ns / 1000);
-#endif
+                hdr_usleep(sleep_time_us);
             }
         }
     }

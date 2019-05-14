@@ -24,49 +24,79 @@ void hdr_mutex_free(struct hdr_mutex* mutex)
 #endif
 
 #include <windows.h>
+#include <WinSock2.h>
 
 int hdr_mutex_init(struct hdr_mutex* mutex)
 {
-	InitializeCriticalSection((CRITICAL_SECTION*)(mutex->_critical_section));
-	return 0;
+    InitializeCriticalSection((CRITICAL_SECTION*)(mutex->_critical_section));
+    return 0;
 }
 
 void hdr_mutex_destroy(struct hdr_mutex* mutex)
 {
-	DeleteCriticalSection((CRITICAL_SECTION*)(mutex->_critical_section));
+    DeleteCriticalSection((CRITICAL_SECTION*)(mutex->_critical_section));
 }
 
 void hdr_mutex_lock(struct hdr_mutex* mutex)
 {
-	EnterCriticalSection((CRITICAL_SECTION*)(mutex->_critical_section));
+    EnterCriticalSection((CRITICAL_SECTION*)(mutex->_critical_section));
 }
 
 void hdr_mutex_unlock(struct hdr_mutex* mutex)
 {
-	LeaveCriticalSection((CRITICAL_SECTION*)(mutex->_critical_section));
+    LeaveCriticalSection((CRITICAL_SECTION*)(mutex->_critical_section));
 }
+
+void hdr_yield()
+{
+    Sleep(0);
+}
+
+int hdr_usleep(unsigned int useconds)
+{
+    struct timeval tv;
+
+    tv.tv_sec = (long)useconds / 1000000;
+    tv.tv_usec = useconds % 1000000;
+    select(0, NULL, NULL, NULL, &tv);
+
+    return 0;
+}
+
 
 #else
 #include <pthread.h>
+#include <unistd.h>
 
 int hdr_mutex_init(struct hdr_mutex* mutex)
 {
-	return pthread_mutex_init(&mutex->_mutex, NULL);
+    return pthread_mutex_init(&mutex->_mutex, NULL);
 }
 
 void hdr_mutex_destroy(struct hdr_mutex* mutex)
 {
-	pthread_mutex_destroy(&mutex->_mutex);
+    pthread_mutex_destroy(&mutex->_mutex);
 }
 
 void hdr_mutex_lock(struct hdr_mutex* mutex)
 {
-	pthread_mutex_lock(&mutex->_mutex);
+    pthread_mutex_lock(&mutex->_mutex);
 }
 
 void hdr_mutex_unlock(struct hdr_mutex* mutex)
 {
-	pthread_mutex_unlock(&mutex->_mutex);
+    pthread_mutex_unlock(&mutex->_mutex);
 }
+
+void hdr_yield()
+{
+    sched_yield();
+}
+
+int hdr_usleep(unsigned int useconds)
+{
+    return usleep(useconds);
+}
+
 
 #endif
