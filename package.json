@@ -32,10 +32,10 @@
   },
   "homepage": "https://github.com/mcollina/native-hdr-histogram#readme",
   "devDependencies": {
-    "aws-sdk": "^2.454.0",
+    "aws-sdk": "^2.458.0",
     "pre-commit": "^1.2.2",
     "standard": "^12.0.1",
-    "tap": "^13.1.8"
+    "tap": "^14.0.0"
   },
   "binary": {
     "module_name": "histogram",
@@ -45,7 +45,7 @@
     "host": "https://autocannon-assets.s3-eu-west-1.amazonaws.com"
   },
   "dependencies": {
-    "nan": "^2.13.2",
+    "nan": "^2.14.0",
     "node-pre-gyp": "^0.13.0"
   }
 }
