@@ -1,6 +1,6 @@
 # native-hdr-histogram
 
-node.js bindings for [hdr histogram][hdr] [C implementation][cimpl](version 0.9.3).
+node.js bindings for [hdr histogram][hdr] [C implementation][cimpl](version 0.9.9).
 
 [![Build status](https://ci.appveyor.com/api/projects/status/tgu1of6olrg64so4?svg=true)](https://ci.appveyor.com/project/mcollina/native-hdr-histogram)
 [![Build Status](https://travis-ci.org/mcollina/native-hdr-histogram.svg?branch=master)](https://travis-ci.org/mcollina/native-hdr-histogram)
