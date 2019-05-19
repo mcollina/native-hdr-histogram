@@ -8,17 +8,17 @@ branches:
 matrix:
   include:
   - os: linux
+    env: NODE_VERSION="12"
+  - os: linux
     env: NODE_VERSION="10"
   - os: linux
     env: NODE_VERSION="8"
-  - os: linux
-    env: NODE_VERSION="6"
+  - os: osx
+    env: NODE_VERSION="12"
   - os: osx
     env: NODE_VERSION="10"
   - os: osx
     env: NODE_VERSION="8"
-  - os: osx
-    env: NODE_VERSION="6"
 env:
   global:
   - JOBS: '8'
