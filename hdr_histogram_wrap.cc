@@ -30,7 +30,7 @@ NAN_MODULE_INIT(HdrHistogramWrap::Init) {
 
 HdrHistogramWrap::~HdrHistogramWrap() {
   if (this->histogram) {
-    delete this->histogram;
+    hdr_close(this->histogram);
   }
 }
 
