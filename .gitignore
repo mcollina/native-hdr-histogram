@@ -21,7 +21,7 @@ coverage
 .lock-wscript
 
 # Compiled binary addons (http://nodejs.org/api/addons.html)
-build/Release
+build-tmp-napi-v3/
 
 # Dependency directory
 node_modules
@@ -42,3 +42,4 @@ lib/binding
 
 yarn.lock
 package-lock.json
+.nyc_output

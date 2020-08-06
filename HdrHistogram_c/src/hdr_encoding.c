@@ -95,7 +95,7 @@ int zig_zag_encode_i64(uint8_t* buffer, int64_t signed_value)
     return bytesWritten;
 }
 
-int zig_zag_decode_i64(const uint8_t* buffer, int64_t* retVal)
+int zig_zag_decode_i64(const uint8_t* buffer, int64_t* signed_value)
 {
     uint64_t v = buffer[0];
     uint64_t value = v & 0x7F;
@@ -149,8 +149,15 @@ int zig_zag_decode_i64(const uint8_t* buffer, int64_t* retVal)
         }
     }
 
+#if defined(_MSC_VER)
+#pragma warning(push)
+#pragma warning(disable: 4146) // C4146: unary minus operator applied to unsigned type, result still unsigned
+#endif
     value = (value >> 1) ^ (-(value & 1));
-    *retVal = (int64_t) value;
+#if defined(_MSC_VER)
+#pragma warning(pop)
+#endif
+    *signed_value = (int64_t) value;
 
     return bytesRead;
 }

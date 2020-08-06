@@ -39,13 +39,16 @@
   },
   "binary": {
     "module_name": "histogram",
-    "module_path": "./lib/binding/{node_abi}-{platform}-{arch}",
+    "module_path": "./lib/binding/napi-v{napi_build_version}-{platform}-{arch}",
     "remote_path": "./{name}/v{version}/{toolset}/",
-    "package_name": "{node_abi}-{platform}-{arch}.tar.gz",
-    "host": "https://autocannon-assets.s3-eu-west-1.amazonaws.com"
+    "package_name": "napi-v{napi_build_version}-{platform}-{arch}.tar.gz",
+    "host": "https://autocannon-assets.s3-eu-west-1.amazonaws.com",
+    "napi_versions": [
+      3
+    ]
   },
   "dependencies": {
-    "nan": "^2.14.0",
+    "node-addon-api": "^1.1.0",
     "node-pre-gyp": "^0.13.0"
   }
 }

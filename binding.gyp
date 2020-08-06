@@ -3,24 +3,39 @@
     {
       "target_name": "<(module_name)",
       "sources": [
-        "src/hdr_encoding.h",
-        "src/hdr_encoding.c",
-        "src/hdr_histogram.h",
-        "src/hdr_histogram.c",
-        "src/hdr_histogram_log.h",
-        "src/hdr_histogram_log.c",
-        "src/hdr_time.h",
-        "src/hdr_time.c",
-        "hdr_histogram_wrap.cc",
-        "histogram.cc"
+        "binding-src/binding.cc",
+        "<!@(node -p \"require('fs').readdirSync('./binding-src/binding-util').map(f=>'binding-src/binding-util/'+f).join(' ')\")",
+        "<!@(node -p \"require('fs').readdirSync('./binding-src/binding').map(f=>'binding-src/binding/'+f).join(' ')\")",
+        "<!@(node -p \"require('fs').readdirSync('./HdrHistogram_c/src').map(f=>'HdrHistogram_c/src/'+f).join(' ')\")"
       ],
       "dependencies": [
+        "<!(node -p \"require('node-addon-api').gyp\")",
         "<(module_root_dir)/zlib/zlib.gyp:zlib"
       ],
       "include_dirs": [
-        "<!(node -e \"require('nan')\")",
-        "src/"
-      ]
+        "binding-src/binding-util",
+        "HdrHistogram_c/src",
+        "<!@(node -p \"require('node-addon-api').include\")"
+      ],
+      "cflags!": [
+        "-fno-exceptions"
+      ],
+      "cflags_cc!": [
+        "-fno-exceptions"
+      ],
+      "defines": [
+        "NAPI_VERSION=<(napi_build_version)"
+      ],
+      "xcode_settings": {
+        "GCC_ENABLE_CPP_EXCEPTIONS": "YES",
+        "CLANG_CXX_LIBRARY": "libc++",
+        "MACOSX_DEPLOYMENT_TARGET": "10.7"
+      },
+      "msvs_settings": {
+        "VCCLCompilerTool": {
+          "ExceptionHandling": 1
+        }
+      }
     },
     {
       "target_name": "action_after_build",
