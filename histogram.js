@@ -2,7 +2,6 @@
 
 const path = require('path')
 const { HdrHistogram, HdrHistogramIterator } = require('node-gyp-build')(path.join(__dirname, '.'))
-console.log(HdrHistogram, HdrHistogramIterator)
 const isNumber = value => typeof value === 'number' && value !== Infinity && value !== -Infinity
 
 class Histogram extends HdrHistogram {
