@@ -1,0 +1,33 @@
+name: Test
+
+on:
+  push:
+  pull_request:
+  schedule:
+    - cron: "0 4 * * 0"
+
+jobs:
+  test:
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        node-version: [12.x, 14.x]
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v2
+        with:
+          submodules: true
+
+      - name: Install Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - run: npm install
+      - name: Environment Information
+        run: npx envinfo
+      - name: Run Test
+        run: npm test

@@ -1,0 +1,94 @@
+name: Prebuild Binaries
+
+on:
+  push:
+    tags:        
+      - v*
+
+env:
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+jobs:
+  create_release:
+    name: Create Release
+    runs-on: ubuntu-latest
+    outputs:
+      upload_url: ${{ steps.create_release.outputs.upload_url }}
+    steps:
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: ${{ github.ref }}
+          prerelease: true
+          body: |
+            The archive files in this release are not meant to be downloaded directly.
+            Instead, the binaries are downloaded by prebuildify-ci and bundled into the npm module.
+
+  prebuild:
+    strategy:
+      matrix:
+        os: [ ubuntu-latest, macos-latest, windows-latest ]
+
+    name: Prebuild ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 20
+    needs: create_release
+
+    steps:
+      - if: matrix.os == 'ubuntu-latest'
+        name: Install Linux Toolchain
+        run: sudo apt-get install g++-multilib
+
+      - name: Checkout Code
+        uses: actions/checkout@v2
+        with:
+          submodules: true
+
+      - name: Install Node.js
+        uses: actions/setup-node@v1
+        with:
+          node-version: 14.x
+
+      - if: matrix.os != 'windows-latest'
+        name: Set Archive Env Variables (Linux, macOS)
+        run: |
+          echo ::set-env name=ARCHIVE_NAME::${GITHUB_REF#refs/tags/}-${{ runner.os }}.tar
+          echo ::set-env name=ARCHIVE_TYPE::application/tar
+      - if: matrix.os == 'windows-latest'
+        name: Set Archive Env Variables (Windows)
+        run: |
+          echo ::set-env name=ARCHIVE_NAME::${GITHUB_REF#refs/tags/}-${{ runner.os }}.zip
+          echo ::set-env name=ARCHIVE_TYPE::application/zip
+        shell: bash
+
+      - name: Install
+        run: npm install
+
+      - name: Prebuild 64-bit # build 64-bit for each os
+        run: npm run prebuild
+ 
+      - if: matrix.os == 'ubuntu-latest' # linux only, no macOS 32-bit build
+        name: Prebuild 32-bit (Linux)
+        run: PREBUILD_ARCH=ia32 npm run prebuild
+      - if: matrix.os == 'windows-latest' # windows only
+        name: Prebuild 32-bit (Windows)
+        run: |
+          $env:PREBUILD_ARCH = "ia32"
+          npm run prebuild
+
+      - if: matrix.os != 'windows-latest'
+        name: Archive Prebuilds (Linux, macOS)
+        run: tar --create --verbose --file=${ARCHIVE_NAME} --directory ./prebuilds .
+      - if: matrix.os == 'windows-latest'
+        name: Archive Prebuilds (Windows)
+        run: Compress-Archive -Path .\prebuilds\* -DestinationPath .\$env:ARCHIVE_NAME
+
+      - name: Upload Archive to GitHub Release
+        uses: actions/upload-release-asset@v1
+        with:
+          upload_url: ${{ needs.create_release.outputs.upload_url }}
+          asset_path: ./${{ env.ARCHIVE_NAME }}
+          asset_name: ${{ env.ARCHIVE_NAME }}
+          asset_content_type: ${{ env.ARCHIVE_TYPE }}

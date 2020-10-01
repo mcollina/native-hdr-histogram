@@ -1,9 +1,8 @@
 'use strict'
 
-const binary = require('node-pre-gyp')
 const path = require('path')
-const bindingPath = binary.find(path.resolve(path.join(__dirname, './package.json')))
-const { HdrHistogram, HdrHistogramIterator } = require(bindingPath)
+const { HdrHistogram, HdrHistogramIterator } = require('node-gyp-build')(path.join(__dirname, '.'))
+console.log(HdrHistogram, HdrHistogramIterator)
 const isNumber = value => typeof value === 'number' && value !== Infinity && value !== -Infinity
 
 class Histogram extends HdrHistogram {
@@ -46,7 +45,7 @@ class Histogram extends HdrHistogram {
    * @memberof Histogram
    */
   static decode (encoded) {
-    let histogram = new Histogram(1, 10) // the values here are immaterial
+    const histogram = new Histogram(1, 10) // the values here are immaterial
     histogram.setEncoded(encoded)
     return histogram
   }
@@ -81,8 +80,8 @@ class Histogram extends HdrHistogram {
    * @memberof Histogram
    */
   percentiles (ticksPerHalfDistance) {
-    let result = []
-    let iter = new HdrHistogramIterator(this)
+    const result = []
+    const iter = new HdrHistogramIterator(this)
     iter.initPercentile(ticksPerHalfDistance || 1)
     while (iter.next()) {
       result.push({ percentile: iter.getPercentile(), value: iter.getValue() })
@@ -103,8 +102,8 @@ class Histogram extends HdrHistogram {
    * @memberof Histogram
    */
   linearcounts (valueUnitsPerBucket) {
-    let result = []
-    let iter = new HdrHistogramIterator(this)
+    const result = []
+    const iter = new HdrHistogramIterator(this)
     iter.initLinear(valueUnitsPerBucket)
     while (iter.next()) {
       result.push({ count: iter.getCountLinear(), value: iter.getValue() })
@@ -128,8 +127,8 @@ class Histogram extends HdrHistogram {
    * @memberof Histogram
    */
   logcounts (valueUnitsFirstBucket, logBase) {
-    let result = []
-    let iter = new HdrHistogramIterator(this)
+    const result = []
+    const iter = new HdrHistogramIterator(this)
     iter.initLog(valueUnitsFirstBucket, logBase)
     while (iter.next()) {
       result.push({ count: iter.getCountLog(), value: iter.getValue() })
@@ -148,8 +147,8 @@ class Histogram extends HdrHistogram {
    * @memberof Histogram
    */
   recordedcounts () {
-    let result = []
-    let iter = new HdrHistogramIterator(this)
+    const result = []
+    const iter = new HdrHistogramIterator(this)
     iter.initRecorded()
     while (iter.next()) {
       result.push({ count: iter.getCountRecorded(), value: iter.getValue() })

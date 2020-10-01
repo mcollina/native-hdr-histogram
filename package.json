@@ -5,9 +5,8 @@
   "main": "histogram.js",
   "gypfile": "true",
   "scripts": {
-    "prepublish": "npm ls",
-    "install": "node-pre-gyp install --fallback-to-build",
-    "build": "node-pre-gyp rebuild",
+    "install": "node-gyp-build",
+    "prebuild": "prebuildify --napi",
     "test": "standard && tap test.js"
   },
   "precommit": [
@@ -20,11 +19,13 @@
   "keywords": [
     "hdr",
     "histogram",
-    "native"
+    "native",
+    "n-api"
   ],
   "author": "Matteo Collina <hello@matteocollina.com>",
   "contributors": [
-    "Glen Keane <glenkeane.94@gmail.com> (http://glenkeane.me/)"
+    "Glen Keane <glenkeane.94@gmail.com> (http://glenkeane.me/)",
+    "Jim Schlight <jim@inspiredware.com> (https://github.com/jschlight)"
   ],
   "license": "MIT",
   "bugs": {
@@ -32,23 +33,25 @@
   },
   "homepage": "https://github.com/mcollina/native-hdr-histogram#readme",
   "devDependencies": {
-    "aws-sdk": "^2.458.0",
     "pre-commit": "^1.2.2",
-    "standard": "^12.0.1",
+    "prebuildify": "^4.0.0",
+    "prebuildify-ci": "^1.0.5",
+    "standard": "^14.3.4",
     "tap": "^14.0.0"
   },
-  "binary": {
-    "module_name": "histogram",
-    "module_path": "./lib/binding/napi-v{napi_build_version}-{platform}-{arch}",
-    "remote_path": "./{name}/v{version}/{toolset}/",
-    "package_name": "napi-v{napi_build_version}-{platform}-{arch}.tar.gz",
-    "host": "https://autocannon-assets.s3-eu-west-1.amazonaws.com",
-    "napi_versions": [
-      3
-    ]
-  },
   "dependencies": {
-    "node-addon-api": "^1.1.0",
-    "node-pre-gyp": "^0.13.0"
-  }
+    "node-addon-api": "^3.0.0",
+    "node-gyp-build": "^4.2.3"
+  },
+  "files": [
+    "binding-src/",
+    "HdrHistogram_c/src/",
+    "prebuilds/",
+    "zlib/",
+    "binding.gyp",
+    "histogram.js",
+    "package.json",
+    "LICENSE",
+    "README.md"
+  ]
 }

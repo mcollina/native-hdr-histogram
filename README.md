@@ -1,9 +1,9 @@
 # native-hdr-histogram
 
-node.js bindings for [hdr histogram][hdr] [C implementation][cimpl](version 0.9.10).
+node.js bindings for [hdr histogram][hdr] [C implementation][cimpl] (version 0.11.1)
 
-[![Build status](https://ci.appveyor.com/api/projects/status/tgu1of6olrg64so4?svg=true)](https://ci.appveyor.com/project/mcollina/native-hdr-histogram)
-[![Build Status](https://travis-ci.org/mcollina/native-hdr-histogram.svg?branch=master)](https://travis-ci.org/mcollina/native-hdr-histogram)
+![Test](https://github.com/mcollina/native-hdr-histogram/workflows/Test/badge.svg)
+![Prebuild Binaries](https://github.com/mcollina/native-hdr-histogram/workflows/Prebuild%20Binaries/badge.svg)
 [![N-API v3 Badge](https://img.shields.io/badge/N--API-v3-green.svg)](https://nodejs.org/dist/latest/docs/api/n-api.html#n_api_n_api)
 
 > HDR Histogram is designed for recoding histograms of value measurements
@@ -24,7 +24,7 @@ supported.
 
 ## Install
 
-```
+```bash
 npm i native-hdr-histogram --save
 ```
 
@@ -75,7 +75,7 @@ console.log(histogram.percentiles())
   * <a href="#areValuesEquivalent"><code>histogram#<b>areValuesEquivalent()</b></code></a>
   * <a href="#add"><code>histogram#<b>add()</b></code></a>
   * <a href="#reset"><code>histogram#<b>reset()</b></code></a>
-  
+
 #### Properties
   * <a href="#lowestTrackableValue"><code>histogram#lowestTrackableValue</code></a>
   * <a href="#highestTrackableValue"><code>histogram#highestTrackableValue</code></a>
@@ -111,7 +111,7 @@ successful, `false` otherwise.
 
 Record `value` in the histogram with a count of `count` and backfill based on a `expectedInterval`.
 This is specifically used for recording latency.  If `value` is larger than the `expectedInterval` 
-then the latency recording system has experienced co-ordinated omission.  This method fills in the
+then the latency recording system has experienced coordinated omission.  This method fills in the
 values that would have occurred had the client providing the load not been blocked.
 
 Returns `true` if the recording was successful, `false` otherwise.
@@ -149,7 +149,7 @@ Return the standard deviation of the histogram.
 
 ### histogram.percentile(percentile)
 
-Returns the value at the given percentile. `percentile` must be >
+Returns the value at the given percentile. `percentile` must be >
 0 and <= 100, otherwise it will throw.
 
 -------------------------------------------------------
@@ -354,10 +354,6 @@ Get the memory size of the Histogram.
 
 This project was kindly sponsored by [nearForm](http://nearform.com).
 
-The pre-compilation work of this project is only possible because of [mapbox's][mapbox]
-amazing work on [node-pre-gyp][node-pre-gyp]. A lot of the functionality enabled
-is following the example set by their [node-sqlite3 library][sqlite3].
-
 ## License
 
 This library is licensed as MIT
@@ -365,8 +361,6 @@ This library is licensed as MIT
 HdrHistogram_c is licensed as [BSD license][HdrHistogram_c-license]
 
 zlib is licensed as [zlib License][zlib-license]
-
-The scripts used in the scripts folder are modified [BSD licensed][sqlite3-scripts-license] scripts from the [node-sqlite3][sqlite3] libary.
 
 [hdr]: http://hdrhistogram.org/
 [cimpl]: https://github.com/HdrHistogram/HdrHistogram_c
